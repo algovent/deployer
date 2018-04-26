@@ -9,29 +9,21 @@ env.user = 'ubuntu'
 env.key_filename = '~/certs/petcareHandler.pem'
 
 def deploy():
-    _setup_prereq()
     site_folder = f'/home/{env.user}/sites/{env.host}'
     run(f'mkdir -p {site_folder}')
     with cd(site_folder):
         _get_latest_source()
         _update_virtualenv()
         _create_or_update_dotenv()
-        _update_static_files()
+        #_update_static_files()
         _update_database()
-
-def _setup_prereq():
-    #check if pip
-
-def setup_server_configs():
-
 
 def _get_latest_source():
     if exists('.git'):
         run('git fetch')
     else:
         run(f'git clone {REPO_URL} .')
-    current_commit = local("git log -n 1 --format=%H", capture=True)
-    run(f'git reset --hard {current_commit}')
+    run(f'git pull')
 
 def _update_virtualenv():
     if not exists('prodenv/bin/pip'):
