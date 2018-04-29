@@ -25,7 +25,7 @@ SECRET_KEY = '-aswj=mc0@xlmw*$#n2fcqojt##b+-a%$%re1xbp4ygni!er-_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['www.algovent.com', 'algovent.com']
 
 
 # Application definition
@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'deployer.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'deployer',
         'USER': 'root',
         'PASSWORD': '',

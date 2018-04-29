@@ -2,32 +2,37 @@ import random
 from fabric.contrib.files import append, exists
 from fabric.api import cd, env, local, run
 
-REPO_URL = 'https://naveen_bollimpalli@bitbucket.org/algovent/petcarehandler.git'
-SERVER_CONFIG_URL = ''
+CONFIGS = [{'REPO_URL': 'https://naveen_bollimpalli@bitbucket.org/algovent/petcarehandler.git', 'APP_NAME': 'petcareHandler'},{'REPO_URL' : 'https://naveen_bollimpalli@bitbucket.org/algovent/algovent_website.git', 'APP_NAME' : 'algovent'}]
 env.hosts = ['ec2-13-232-13-243.ap-south-1.compute.amazonaws.com']
 env.user = 'ubuntu'
 env.key_filename = '~/certs/petcareHandler.pem'
 
 def deploy():
-    site_folder = f'/home/{env.user}/sites/{env.host}'
-    run(f'mkdir -p {site_folder}')
-    with cd(site_folder):
-        _get_latest_source()
-        _update_virtualenv()
-        _create_or_update_dotenv()
-        #_update_static_files()
-        _update_database()
+    for config in CONFIGS:
+        app_name = config['APP_NAME']
+        repo_url = config['REPO_URL']
+        site_folder = f'/home/{env.user}/sites/{app_name}'
+        run(f'mkdir -p {site_folder}')
+        with cd(site_folder):
+            _get_latest_source(repo_url)
+            _update_virtualenv()
+            _create_or_update_dotenv()
+            #_update_static_files()
+            _update_database()
+            _restart_server()
 
-def _get_latest_source():
+def _get_latest_source(repo_url):
     if exists('.git'):
         run('git fetch')
     else:
-        run(f'git clone {REPO_URL} .')
+        run(f'git clone {repo_url} .')
     run(f'git pull')
 
 def _update_virtualenv():
     if not exists('prodenv/bin/pip'):
         run(f'python3 -m venv prodenv')
+    if not exists('prodenv/bin/wheel'):
+        run('./prodenv/bin/pip install wheel')
     run('./prodenv/bin/pip install -r requirements.txt')
 
 def _create_or_update_dotenv():
@@ -45,3 +50,12 @@ def _update_static_files():
 
 def _update_database():
     run('./prodenv/bin/python manage.py migrate --noinput')
+
+def _restart_server():
+    run('sudo service nginx stop')
+    run('sudo systemctl stop gunicorn')
+    run('sudo systemctl stop gunicorn_al')
+    run('sudo systemctl start gunicorn')
+    run('sudo systemctl start gunicorn_al')
+    run('sudo service nginx start')
+
