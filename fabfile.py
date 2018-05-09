@@ -2,7 +2,7 @@ import random
 from fabric.contrib.files import append, exists
 from fabric.api import cd, env, local, run
 
-CONFIGS = [{'REPO_URL': 'https://naveen_bollimpalli@bitbucket.org/algovent/petcarehandler.git', 'APP_NAME': 'petcareHandler'},{'REPO_URL' : 'https://naveen_bollimpalli@bitbucket.org/algovent/algovent_website.git', 'APP_NAME' : 'algovent'}]
+CONFIGS = [{'REPO_URL': 'git@bitbucket.org:algovent/algovent_website.git', 'APP_NAME': 'algovent'},{'REPO_URL' : 'git@bitbucket.org:algovent/petcarehandler.git', 'APP_NAME' : 'petcareHandler'}]
 env.hosts = ['ec2-13-232-13-243.ap-south-1.compute.amazonaws.com']
 env.user = 'ubuntu'
 env.key_filename = '~/certs/petcareHandler.pem'
@@ -17,9 +17,8 @@ def deploy():
             _get_latest_source(repo_url)
             _update_virtualenv()
             _create_or_update_dotenv()
-            #_update_static_files()
             _update_database()
-            _restart_server()
+    _restart_server()
 
 def _get_latest_source(repo_url):
     if exists('.git'):
@@ -44,9 +43,6 @@ def _create_or_update_dotenv():
             'abcdefghijklmnopqrstuvwxyz0123456789', k=50
         ))
         append('.env', f'DJANGO_SECRET_KEY={new_secret}')
-
-def _update_static_files():
-    run('./prodenv/bin/python manage.py collectstatic --noinput')
 
 def _update_database():
     run('./prodenv/bin/python manage.py migrate --noinput')
