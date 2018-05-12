@@ -2,7 +2,7 @@ import random
 from fabric.contrib.files import append, exists
 from fabric.api import cd, env, local, run
 
-CONFIGS = [{'REPO_URL': 'git@bitbucket.org:algovent/algovent_website.git', 'APP_NAME': 'algovent'},{'REPO_URL' : 'git@bitbucket.org:algovent/petcarehandler.git', 'APP_NAME' : 'petcareHandler'}]
+CONFIGS = [{'REPO_URL': 'git@bitbucket.org:algovent/algovent_website.git', 'APP_NAME': 'algovent'},{'REPO_URL' : 'git@bitbucket.org:algovent/petcarehandler.git', 'APP_NAME' : 'petcareHandler'},{'REPO_URL' : 'git@bitbucket.org:algovent/eventico.git', 'APP_NAME' : 'eventico'}]
 env.hosts = ['ec2-13-232-13-243.ap-south-1.compute.amazonaws.com']
 env.user = 'ubuntu'
 env.key_filename = '~/certs/petcareHandler.pem'
@@ -51,7 +51,9 @@ def _restart_server():
     run('sudo service nginx stop')
     run('sudo systemctl stop gunicorn')
     run('sudo systemctl stop gunicorn_al')
+    run('sudo systemctl stop gunicorn_ev')
     run('sudo systemctl start gunicorn')
     run('sudo systemctl start gunicorn_al')
+    run('sudo systemctl start gunicorn_ev')
     run('sudo service nginx start')
 
